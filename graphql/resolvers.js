@@ -42,6 +42,12 @@ const resolvers = {
   },
 
   Subscription: {
+    newComment: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterableIterator(["NEW_COMMENT"]),
+        (payload, variables) => payload.newComment.postId.toString() === variables.postId.toString()
+      ),
+    },
     newPost: {
       subscribe: () => {
         return pubsub.asyncIterableIterator(["NEW_POST"])

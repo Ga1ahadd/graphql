@@ -59,6 +59,15 @@ const wsServer = new WebSocketServer({
   path: "/graphql",
 })
 
+useServer(
+  {
+    onConnect: ctx => console.log("Connexion WebSocket"),
+    onDisconnect: () => console.log("Déconnexion WebSocket"),
+    onError: err => console.error("WebSocket error :", err),
+  },
+  wsServer
+)
+
 const executableSchema = makeExecutableSchema({ typeDefs, resolvers });
 useServer({ schema: executableSchema }, wsServer);
 

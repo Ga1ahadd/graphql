@@ -50,8 +50,9 @@ const typeDefs = gql`
 
   # Subscriptions
   type Subscription {
-    newPost: Post
-  }
+  newPost: Post
+  newComment(postId: ID!): Comment!
+}
 `
 
 export default typeDefs
