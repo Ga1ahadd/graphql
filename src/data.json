@@ -1,0 +1,308 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "username": "alice_dupont",
+      "fullName": "Alice Dupont",
+      "email": "alice.dupont@example.com",
+      "password": "password123",
+      "avatar": "1.jpeg",
+      "bio": "Photographe & exploratrice 📸✈️",
+      "followers": ["2", "3"],
+      "following": ["2"]
+    },
+    {
+      "id": "2",
+      "username": "bob_martin",
+      "fullName": "Bob Martin",
+      "email": "bob.martin@example.com",
+      "password": "securePass456",
+      "avatar": "2.jpg",
+      "bio": "Aventurier & passionné de nature 🌿🏔️",
+      "followers": ["1"],
+      "following": ["1", "3"]
+    },
+    {
+      "id": "3",
+      "username": "charlie_lee",
+      "fullName": "Charlie Lee",
+      "email": "charlie.lee@example.com",
+      "password": "charlie789",
+      "avatar": "3.jpg",
+      "bio": "Développeur web & amateur de café ☕💻",
+      "followers": ["2"],
+      "following": ["1"]
+    },
+    {
+      "id": "4",
+      "username": "david_leroy",
+      "fullName": "David Leroy",
+      "email": "david@example.com",
+      "password": "hashed_password",
+      "avatar": "4.jpg",
+      "bio": "",
+      "followers": [],
+      "following": []
+    },
+    {
+      "id": "5",
+      "username": "emma_morel",
+      "fullName": "Emma Morel",
+      "email": "emma@example.com",
+      "password": "hashed_password",
+      "avatar": "5.jpg",
+      "bio": "",
+      "followers": [],
+      "following": []
+    },
+    {
+      "id": "6",
+      "username": "fanny_rousseau",
+      "fullName": "Fanny Rousseau",
+      "email": "fanny@example.com",
+      "password": "hashed_password",
+      "avatar": "6.jpeg",
+      "bio": "",
+      "followers": [],
+      "following": []
+    },
+    {
+      "id": "7",
+      "username": "georges_blanc",
+      "fullName": "Georges Blanc",
+      "email": "georges@example.com",
+      "password": "hashed_password",
+      "avatar": "7.png",
+      "bio": "",
+      "followers": [],
+      "following": []
+    },
+    {
+      "id": "8",
+      "username": "hugo_bernard",
+      "fullName": "Hugo Bernard",
+      "email": "hugo@example.com",
+      "password": "hashed_password",
+      "avatar": "8.jpg",
+      "bio": "",
+      "followers": [],
+      "following": []
+    },
+    {
+      "id": "9",
+      "username": "isabelle_petit",
+      "fullName": "Isabelle Petit",
+      "email": "isabelle@example.com",
+      "password": "hashed_password",
+      "avatar": "9.jpg",
+      "bio": "",
+      "followers": [],
+      "following": []
+    },
+    {
+      "id": "10",
+      "username": "julien_moreau",
+      "fullName": "Julien Moreau",
+      "email": "julien@example.com",
+      "password": "hashed_password",
+      "avatar": "10.jpeg",
+      "bio": "",
+      "followers": [],
+      "following": []
+    }
+  ],
+  "posts": [
+    {
+      "id": "1",
+      "userId": "1",
+      "image": "shanghai.jpg",
+      "description": "Vue magnifique de Shanghai au coucher du soleil",
+      "likes": ["2", "3", "5"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "2",
+      "userId": "2",
+      "image": "tokyo.jpg",
+      "description": "Les lumières de Tokyo la nuit sont incroyables !",
+      "likes": ["1", "4", "6", "7"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "3",
+      "userId": "3",
+      "image": "paris.jpg",
+      "description": "La tour Eiffel sous un ciel rosé",
+      "likes": ["5", "8", "10"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "4",
+      "userId": "4",
+      "image": "new_york.jpg",
+      "description": "Central Park en automne 🍂",
+      "likes": ["1", "2", "9"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "5",
+      "userId": "5",
+      "image": "london.jpg",
+      "description": "Big Ben au lever du soleil ☀️",
+      "likes": ["3", "7", "10"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "6",
+      "userId": "6",
+      "image": "berlin.jpg",
+      "description": "Street art à Berlin 🎨",
+      "likes": ["4", "6", "8"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "7",
+      "userId": "7",
+      "image": "rome.jpg",
+      "description": "Colisée au clair de lune",
+      "likes": ["2", "5", "9"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "8",
+      "userId": "8",
+      "image": "barcelona.jpg",
+      "description": "La Sagrada Familia toujours aussi fascinante",
+      "likes": ["1", "3", "7"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "9",
+      "userId": "9",
+      "image": "moscow.jpg",
+      "description": "Neige sur la Place Rouge ❄️",
+      "likes": ["5", "8", "10"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "10",
+      "userId": "10",
+      "image": "dubai.jpg",
+      "description": "Vue aérienne de Dubaï 🌆",
+      "likes": ["1", "4", "7"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "11",
+      "userId": "3",
+      "image": "sydney.jpg",
+      "description": "Opéra de Sydney sous un ciel étoilé",
+      "likes": ["2", "6", "9"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "12",
+      "userId": "6",
+      "image": "los_angeles.jpg",
+      "description": "Coucher de soleil à Santa Monica",
+      "likes": ["3", "8", "10"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "13",
+      "userId": "9",
+      "image": "rio.jpg",
+      "description": "Plage de Copacabana 🏖️",
+      "likes": ["1", "4", "7"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "14",
+      "userId": "5",
+      "image": "bali.jpg",
+      "description": "Rizières en terrasse à Bali 🌿",
+      "likes": ["2", "6", "9"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "15",
+      "userId": "7",
+      "image": "cape_town.jpg",
+      "description": "Table Mountain vue du ciel",
+      "likes": ["3", "8", "10"],
+      "comments": [],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "101",
+      "userId": "1",
+      "image": "shanghai.jpg",
+      "description": "Shanghai au coucher du soleil 🌇 #China #Travel",
+      "likes": ["2", "3"],
+      "comments": ["201", "202"],
+      "createdAt": "2024-02-16T14:30:00Z"
+    },
+    {
+      "id": "102",
+      "userId": "2",
+      "image": "tokyo.jpg",
+      "description": "Les lumières de Tokyo de nuit 🚕🌆 #Japan #TokyoLife",
+      "likes": ["1"],
+      "comments": ["203"],
+      "createdAt": "2024-02-15T19:45:00Z"
+    },
+    {
+      "id": "103",
+      "userId": "3",
+      "image": "paris.jpg",
+      "description": "Balade sur les quais de Seine 🚶‍♂️❤️ #Paris #CityOfLove",
+      "likes": ["1", "2"],
+      "comments": ["204"],
+      "createdAt": "2024-02-14T12:00:00Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "201",
+      "postId": "101",
+      "userId": "2",
+      "text": "Magnifique photo ! J'aimerais visiter Shanghai un jour.",
+      "createdAt": "2024-02-16T15:00:00Z"
+    },
+    {
+      "id": "202",
+      "postId": "101",
+      "userId": "3",
+      "text": "Wow, la vue est incroyable !",
+      "createdAt": "2024-02-16T15:30:00Z"
+    },
+    {
+      "id": "203",
+      "postId": "102",
+      "userId": "1",
+      "text": "J'adore Tokyo ! Cette photo est superbe.",
+      "createdAt": "2024-02-15T20:00:00Z"
+    },
+    {
+      "id": "204",
+      "postId": "103",
+      "userId": "2",
+      "text": "Paris est vraiment une ville magique ✨",
+      "createdAt": "2024-02-14T12:30:00Z"
+    }
+  ]
+}
