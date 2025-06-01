@@ -34,6 +34,16 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type Mutation {
+    signup(email: String!, password: String!): AuthPayload!
+    login(email: String!, password: String!): AuthPayload!
+  }
+
+  type AuthPayload {
+    token: String!
+    user: User!
+  }
+
   # Requêtes
   type Query {
     users: [User]

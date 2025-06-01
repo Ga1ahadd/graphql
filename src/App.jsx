@@ -1,20 +1,28 @@
-import React from "react"
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
-import Feed from "./pages/Feed"
-import Profile from "./pages/Profile"
+import { useState } from "react"
+import AuthForm from "./AuthForm"
 import Navbar from "./Navbar"
+import Feed from "./pages/Feed"
 
-function App() {
+export default function App() {
+  const [token, setToken] = useState(localStorage.getItem("token"))
+
+  const handleLogout = () => {
+    localStorage.removeItem("token")
+    setToken(null)
+  }
+
   return (
-    <Router>
-      <Navbar />
-      <Routes>
-        <Route path="/" element={<Feed />} />
-        <Route path="/profile/:id" element={<Profile />} />
-      </Routes>
-    </Router>
+    <div>
+      <Navbar isLoggedIn={!!token} onLogout={handleLogout} />
+
+      {!token ? (
+        <div style={{ display: "flex", gap: "2rem", justifyContent: "center", marginTop: "2rem" }}>
+          <AuthForm mode="signup" onAuth={setToken} />
+          <AuthForm mode="login" onAuth={setToken} />
+        </div>
+      ) : (
+        <Feed token={token} />
+      )}
+    </div>
   )
 }
-
-export default App
-
