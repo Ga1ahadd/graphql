@@ -14,6 +14,7 @@ function Feed() {
 
   const [newPostImage, setNewPostImage] = useState("")
   const [newPostDesc, setNewPostDesc] = useState("")
+  const [commentTexts, setCommentTexts] = useState({})
 
   const currentUser = {
     id: "1",
@@ -39,14 +40,11 @@ function Feed() {
   }
 
   const handleAddComment = async (postId, text) => {
+    if (!text?.trim()) return;
+
     try {
       await addCommentMutation({
-        variables: {
-          postId,
-          userId: currentUser.id,
-          text
-        },
-        
+        variables: { postId, text },
         update(cache, { data: { addComment } }) {
           const existing = cache.readQuery({ query: GET_POSTS })
           const updatedPosts = existing.posts.map(post =>
@@ -60,6 +58,8 @@ function Feed() {
           })
         }
       })
+      // 🧹 On vide le champ ici
+      setCommentTexts(prev => ({ ...prev, [postId]: "" }))
     } catch (err) {
       console.error("Erreur ajout commentaire:", err)
     }
@@ -70,7 +70,6 @@ function Feed() {
 
   return (
     <div className="feed">
-
       <div className="new-post">
         <input
           type="text"
@@ -100,7 +99,6 @@ function Feed() {
           <img src={`/images/${post.image}`} alt={post.description} className="post-image" />
           <p>{post.description}</p>
 
-
           <div className="comments">
             {post.comments.map(c => (
               <div key={c.id} className="comment">
@@ -109,17 +107,31 @@ function Feed() {
             ))}
           </div>
 
-
-          <input
-            type="text"
-            placeholder="Ajouter un commentaire..."
-            onKeyDown={e => {
-              if (e.key === "Enter" && e.target.value.trim() !== "") {
-                handleAddComment(post.id, e.target.value.trim())
-                e.target.value = ""
+          <div className="comment-form">
+            <input
+              type="text"
+              placeholder="Ajouter un commentaire..."
+              value={commentTexts[post.id] || ""}
+              onChange={e =>
+                setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))
               }
-            }}
-          />
+              onKeyDown={e => {
+                if (e.key === "Enter") {
+                  handleAddComment(post.id, commentTexts[post.id] || "")
+                }
+              }}
+            />
+            <button
+              onClick={() => {
+                const comment = commentTexts[post.id];
+                if (comment && comment.trim()) {
+                  handleAddComment(post.id, comment);
+                }
+              }}
+            >
+              Publier
+            </button>
+          </div>
         </div>
       ))}
     </div>

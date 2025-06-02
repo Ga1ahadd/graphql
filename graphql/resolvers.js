@@ -24,7 +24,7 @@ const resolvers = {
 
   Mutation: {
     addComment: async (_, { postId, text }) => {
-      const userId = "65f1a1a1a1a1a1a1a1a1a1a2"; // exemple fixe, à remplacer
+      const userId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe, à remplacer
 
       try {
         const newComment = new Comment({ postId, userId, text });

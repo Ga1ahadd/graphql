@@ -22,12 +22,12 @@ export const ADD_POST = gql`
 `
 
 export const ADD_COMMENT = gql`
-  mutation AddComment($postId: ID!, $userId: ID!, $text: String!) {
-    addComment(postId: $postId, userId: $userId, text: $text) {
+  mutation AddComment($postId: ID!, $text: String!) {
+    addComment(postId: $postId, text: $text) {
       id
       text
       createdAt
-      user {
+      userId {
         id
         username
       }
