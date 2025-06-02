@@ -244,3 +244,54 @@ button:hover {
   margin-left: 0;
 }
 
+/*Sytle du dropdown*/
+
+.dropdown-wrapper {
+  position: relative;
+}
+
+.dropdown-toggle-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-toggle {
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: white;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  min-width: 220px;
+  z-index: 10;
+  flex-direction: column;
+  border-radius: 4px;
+  padding: 0.5rem 0;
+}
+
+.dropdown-item {
+  padding: 0.5rem 1rem;
+  display: block;
+  text-decoration: none;
+  color: #333;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f0f0;
+}
+
+.no-community {
+  font-style: italic;
+  color: #888;
+  pointer-events: none;
+}
+
+.dropdown-toggle-wrapper:hover .dropdown-menu {
+  display: flex;
+}

@@ -1,4 +1,3 @@
-// graphql/schema.js
 import { gql } from "apollo-server-express"
 
 const typeDefs = gql`
@@ -6,7 +5,7 @@ const typeDefs = gql`
   type User {
     id: ID!
     username: String!
-    fullname: String!
+    fullName: String!
     email: String!
     password: String!
     avatar: String!
@@ -34,6 +33,15 @@ const typeDefs = gql`
     createdAt: String!
   }
 
+  type Community {
+    id: ID!
+    idCommunity: Int!
+    name: String!
+    description: String
+    members: [User!]!
+    createdAt: String
+  }
+
   # Requêtes
   type Query {
     users: [User]
@@ -41,6 +49,9 @@ const typeDefs = gql`
     posts: [Post]
     post: Post
     comments(postId: ID!): [Comment]
+
+    communitiesByUser: [Community!]!
+    community(idCommunity: Int!): Community
   }
 
   # Mutations

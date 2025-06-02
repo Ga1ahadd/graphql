@@ -2,6 +2,7 @@ import { PubSub, withFilter } from "graphql-subscriptions"
 import User from "./models/user.js"
 import Post from "./models/post.js"
 import Comment from "./models/comment.js"
+import Community from "./models/community.js"
 
 const pubsub = new PubSub()
 
@@ -13,18 +14,29 @@ const resolvers = {
       return test;
     },
     user: async (_, { id }) => await User.findById(id),
+
     posts: async () =>
       await Post.find()
         .populate("userId")
         .populate("comments")
         .sort({ createdAt: -1 }),
+
     post: async (_, { id }) => await Post.findById(id).populate("userId"),
+
     comments: async (_, { postId }) => await Comment.find({ postId }).populate("userId"),
+
+    communitiesByUser: async () => {
+      const userId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe
+      return await Community.find({ members: userId });
+    },
+    community: async (_, { idCommunity }) => {
+    return await Community.findOne({ idCommunity }).populate("members")
+  },
   },
 
   Mutation: {
     addComment: async (_, { postId, text }) => {
-      const userId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe, à remplacer
+      const userId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe
 
       try {
         const newComment = new Comment({ postId, userId, text });
@@ -44,7 +56,7 @@ const resolvers = {
   Subscription: {
     newPost: {
       subscribe: () => {
-        return pubsub.asyncIterableIterator(["NEW_POST"])
+        return pubsub.asyncIterableIterator(["NEW_POST"]);
       },
     },
   },
