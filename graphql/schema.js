@@ -35,7 +35,6 @@ const typeDefs = gql`
 
   type Community {
     id: ID!
-    idCommunity: Int!
     name: String!
     description: String
     members: [User!]!
@@ -45,18 +44,24 @@ const typeDefs = gql`
   # Requêtes
   type Query {
     users: [User]
-    user: User
+    user(id: ID!): User
     posts: [Post]
-    post: Post
+    post(id: ID!): Post
     comments(postId: ID!): [Comment]
 
     communitiesByUser: [Community!]!
-    community(idCommunity: Int!): Community
+    community(id: ID!): Community
+    postsByCommunity(id: ID!): [Post!]!
+    nonMembers(communityId: ID!): [User!]!
   }
 
   # Mutations
   type Mutation {
     addComment(postId: ID!, text: String!): Comment
+    addCommunity(name: String!, description: String): Community
+    updateCommunity(id: ID!, name: String, description: String): Community
+    deleteCommunity(id: ID!): Boolean
+    addMemberToCommunity(communityId: ID!, userId: ID!): Community
   }
 
   # Subscriptions

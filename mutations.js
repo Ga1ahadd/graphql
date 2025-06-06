@@ -34,3 +34,43 @@ export const ADD_COMMENT = gql`
     }
   }
 `
+
+export const ADD_MEMBER_TO_COMMUNITY = gql`
+  mutation AddMemberToCommunity($communityId: ID!, $userId: ID!) {
+    addMemberToCommunity(communityId: $communityId, userId: $userId) {
+      id
+      name
+      members {
+        id
+        username
+        fullName
+      }
+    }
+  }
+`
+
+export const ADD_COMMUNITY = gql`
+  mutation AddCommunity($name: String!, $description: String) {
+    addCommunity(name: $name, description: $description) {
+      id
+      name
+      description
+    }
+  }
+`
+
+export const UPDATE_COMMUNITY = gql`
+  mutation UpdateCommunity($id: ID!, $name: String, $description: String) {
+    updateCommunity(id: $id, name: $name, description: $description) {
+      id
+      name
+      description
+    }
+  }
+`
+
+export const DELETE_COMMUNITY = gql`
+  mutation DeleteCommunity($id: ID!) {
+    deleteCommunity(id: $id)
+  }
+`

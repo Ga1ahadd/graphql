@@ -26,7 +26,7 @@ function Navbar() {
 
         <div className="dropdown-wrapper">
           <div className="dropdown-toggle-wrapper">
-            <span className="dropdown-toggle">🌐 Communautés</span>
+            <span className="dropdown-toggle">Communautés</span>
             <div className="dropdown-menu">
               {loading ? (
                 <span className="dropdown-item">Chargement...</span>
@@ -47,6 +47,9 @@ function Navbar() {
                   Vous ne faites partie d'aucune communauté
                 </span>
               )}
+              <Link to="/admin/communities" className="dropdown-item admin-link">
+                Gérer les communautés
+              </Link>
             </div>
           </div>
         </div>

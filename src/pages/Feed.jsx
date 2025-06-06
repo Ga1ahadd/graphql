@@ -58,7 +58,7 @@ function Feed() {
           })
         }
       })
-      // 🧹 On vide le champ ici
+      
       setCommentTexts(prev => ({ ...prev, [postId]: "" }))
     } catch (err) {
       console.error("Erreur ajout commentaire:", err)
