@@ -27,8 +27,8 @@ export const GET_POSTS = gql`
 `
 
 export const GET_USER_COMMUNITIES = gql`
-  query {
-    communitiesByUser {
+  query GetUserCommunities($userId: ID!) {
+    communitiesByUser(userId: $userId) {
       id
       name
       description

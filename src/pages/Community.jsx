@@ -48,7 +48,7 @@ function Community() {
   const handleAddComment = async (postId, text) => {
     if (!text?.trim()) return
     try {
-      await addCommentMutation({ variables: { postId, text } })
+      await addCommentMutation({ variables: { postId, text, userId: user.id } })
       setCommentTexts(prev => ({ ...prev, [postId]: "" }))
     } catch (err) {
       console.error("Erreur ajout commentaire:", err)

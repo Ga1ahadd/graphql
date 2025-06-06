@@ -32,11 +32,9 @@ mongoose.connect(dbURI)
 import connectDB from "./db.js";
 connectDB();
 
-// 🎯 3️⃣ Initialisation d'Express et Apollo Server
 const app = express()
 
-// Middleware pour les requêtes JSON
-app.use(express.json()) // Ajout de cette ligne pour parser les corps de requêtes en JSON
+app.use(express.json())
 
 app.use(cors())
 
@@ -50,19 +48,25 @@ const apolloServer = new ApolloServer({
 await apolloServer.start()
 apolloServer.applyMiddleware({ app })
 
-// 🎯 4️⃣ Utilisation des routes REST
-app.use("/api", restRoutes) // Toutes les routes définies dans restRoutes.js seront accessibles via /api
+app.use("/api", restRoutes)
 
-// 🎯 5️⃣ WebSocket Server pour GraphQL Subscriptions
 const wsServer = new WebSocketServer({
   server: httpServer,
   path: "/graphql",
 })
 
 const executableSchema = makeExecutableSchema({ typeDefs, resolvers });
-useServer({ schema: executableSchema }, wsServer);
 
-// 🎯 6️⃣ Démarrage du serveur
+useServer(
+  {
+    schema: executableSchema,
+    onConnect: ctx => console.log("Connexion WebSocket"),
+    onDisconnect: () => console.log("Déconnexion WebSocket"),
+    onError: err => console.error("WebSocket error :", err),
+  },
+  wsServer
+)
+
 const PORT = process.env.PORT || 4000
 httpServer.listen(PORT, () => {
   console.log(`🚀 Serveur GraphQL disponible sur http://localhost:${PORT}/graphql`)

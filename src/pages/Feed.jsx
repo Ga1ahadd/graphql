@@ -40,7 +40,7 @@ function Feed() {
 
     try {
       await addCommentMutation({
-        variables: { postId, text },
+        variables: { postId, text, userId: user.id },
         update(cache, { data: { addComment } }) {
           const existing = cache.readQuery({ query: GET_POSTS })
           const updatedPosts = existing.posts.map(post =>

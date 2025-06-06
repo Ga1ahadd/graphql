@@ -49,7 +49,7 @@ const typeDefs = gql`
     post(id: ID!): Post
     comments(postId: ID!): [Comment]
 
-    communitiesByUser: [Community!]!
+    communitiesByUser(userId: ID!): [Community!]!
     community(id: ID!): Community
     postsByCommunity(id: ID!): [Post!]!
     nonMembers(communityId: ID!): [User!]!
@@ -57,9 +57,9 @@ const typeDefs = gql`
 
   # Mutations
   type Mutation {
-    addComment(postId: ID!, text: String!): Comment
+    addComment(postId: ID!, text: String!, userId: ID!): Comment
     addPost(userId: ID!, image: String!, description: String!): Post
-    addCommunity(name: String!, description: String): Community
+    addCommunity(name: String!, description: String, userId: ID!): Community
     updateCommunity(id: ID!, name: String, description: String): Community
     deleteCommunity(id: ID!): Boolean
     addMemberToCommunity(communityId: ID!, userId: ID!): Community
@@ -69,7 +69,8 @@ const typeDefs = gql`
 
   # Subscriptions
   type Subscription {
-    newPost: Post
+    newComment(postId: ID!): Comment!
+    newPost: Post!
   }
 `
 

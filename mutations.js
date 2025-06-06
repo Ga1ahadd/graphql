@@ -25,8 +25,8 @@ export const ADD_POST = gql`
 `
 
 export const ADD_COMMENT = gql`
-  mutation AddComment($postId: ID!, $text: String!) {
-    addComment(postId: $postId, text: $text) {
+  mutation AddComment($postId: ID!, $text: String!, $userId: ID!) {
+    addComment(postId: $postId, text: $text, userId: $userId) {
       id
       text
       createdAt
@@ -53,8 +53,8 @@ export const ADD_MEMBER_TO_COMMUNITY = gql`
 `
 
 export const ADD_COMMUNITY = gql`
-  mutation AddCommunity($name: String!, $description: String) {
-    addCommunity(name: $name, description: $description) {
+  mutation AddCommunity($name: String!, $description: String, $userId: ID!) {
+    addCommunity(name: $name, description: $description, userId: $userId) {
       id
       name
       description
@@ -84,6 +84,7 @@ export const REGISTER_USER = gql`
       id
       username
       email
+      avatar
     }
   }
 `
@@ -94,6 +95,7 @@ export const LOGIN_USER = gql`
       id
       username
       email
+      avatar
     }
   }
 `

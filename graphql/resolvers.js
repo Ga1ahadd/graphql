@@ -1,4 +1,4 @@
-import { PubSub } from "graphql-subscriptions";
+import { PubSub, withFilter } from "graphql-subscriptions";
 import User from "./models/user.js";
 import Post from "./models/post.js";
 import Comment from "./models/comment.js";
@@ -21,8 +21,7 @@ const resolvers = {
 
     comments: async (_, { postId }) => await Comment.find({ postId }).populate("userId"),
 
-    communitiesByUser: async () => {
-      const userId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe
+    communitiesByUser: async (_, { userId }) => {
       return await Community.find({ members: userId });
     },
 
@@ -47,17 +46,15 @@ const resolvers = {
   },
 
   Mutation: {
-    addComment: async (_, { postId, text }) => {
-      const userId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe
+    addComment: async (_, { postId, text, userId }) => {
       const newComment = new Comment({ postId, userId, text });
       await newComment.save();
       await Post.findByIdAndUpdate(postId, { $push: { comments: newComment._id } });
       return newComment;
     },
 
-    addCommunity: async (_, { name, description }) => {
-      const defaultUserId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe
-      const community = new Community({ name, description, members: [defaultUserId] });
+    addCommunity: async (_, { name, description, userId }) => {
+      const community = new Community({ name, description, members: userId });
       await community.save();
       return await community.populate("members");
     },
@@ -141,8 +138,16 @@ const resolvers = {
   },
 
   Subscription: {
+    newComment: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterableIterator(["NEW_COMMENT"]),
+        (payload, variables) => payload.newComment.postId.toString() === variables.postId.toString()
+      ),
+    },
     newPost: {
-      subscribe: () => pubsub.asyncIterator(["NEW_POST"]),
+      subscribe: () => {
+        return pubsub.asyncIterableIterator(["NEW_POST"])
+      },
     },
   },
 

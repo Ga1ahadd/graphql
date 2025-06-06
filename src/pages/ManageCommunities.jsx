@@ -1,12 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import {
-  GET_USER_COMMUNITIES, GET_COMMUNITY_BY_ID} from "../../queries.js";
-import {
-  ADD_COMMUNITY, UPDATE_COMMUNITY, DELETE_COMMUNITY} from "../../mutations.js";
+import { GET_USER_COMMUNITIES, GET_COMMUNITY_BY_ID} from "../../queries.js";
+import { ADD_COMMUNITY, UPDATE_COMMUNITY, DELETE_COMMUNITY} from "../../mutations.js";
+import { UserContext } from "../UserContext.jsx";
 
 function ManageCommunities() {
-  const { data, loading, error } = useQuery(GET_USER_COMMUNITIES);
+  const { user } = useContext(UserContext);
+  const { data, loading, error } = useQuery(GET_USER_COMMUNITIES, {
+    variables: { userId: user?.id },
+    skip: !user,
+  });
   const [addCommunity] = useMutation(ADD_COMMUNITY, {
     refetchQueries: [{ query: GET_USER_COMMUNITIES }],
   });
@@ -22,7 +25,7 @@ function ManageCommunities() {
 
   const handleCreate = async () => {
     if (!newCommunity.name.trim()) return;
-    await addCommunity({ variables: newCommunity });
+    await addCommunity({ variables: { ...newCommunity, userId: user.id } });
     setNewCommunity({ name: "", description: "" });
   };
 

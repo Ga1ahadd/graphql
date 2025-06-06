@@ -9,6 +9,7 @@ function Navbar() {
   const [communities, setCommunities] = useState([]);
 
   const { data, loading, error } = useQuery(GET_USER_COMMUNITIES, {
+    variables: { userId: user?.id },
     skip: !user,
   });
 
