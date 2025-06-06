@@ -7,11 +7,14 @@ export const ADD_POST = gql`
       image
       description
       createdAt
-      likes
-      user {
+      userId {
         id
         username
         avatar
+      }
+      likes {
+        id
+        username
       }
       comments {
         id
@@ -72,5 +75,25 @@ export const UPDATE_COMMUNITY = gql`
 export const DELETE_COMMUNITY = gql`
   mutation DeleteCommunity($id: ID!) {
     deleteCommunity(id: $id)
+  }
+`
+
+export const REGISTER_USER = gql`
+  mutation Register($username: String!, $fullName: String!, $email: String!, $password: String!, $avatar: String!, $bio: String!) {
+    register(username: $username, fullName: $fullName, email: $email, password: $password, avatar: $avatar, bio: $bio) {
+      id
+      username
+      email
+    }
+  }
+`
+
+export const LOGIN_USER = gql`
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password) {
+      id
+      username
+      email
+    }
   }
 `

@@ -58,10 +58,13 @@ const typeDefs = gql`
   # Mutations
   type Mutation {
     addComment(postId: ID!, text: String!): Comment
+    addPost(userId: ID!, image: String!, description: String!): Post
     addCommunity(name: String!, description: String): Community
     updateCommunity(id: ID!, name: String, description: String): Community
     deleteCommunity(id: ID!): Boolean
     addMemberToCommunity(communityId: ID!, userId: ID!): Community
+    register(username: String!, email: String!, password: String!, fullName: String!, avatar: String!, bio: String!): User
+    login(email: String!, password: String!): User
   }
 
   # Subscriptions

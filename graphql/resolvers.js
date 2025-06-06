@@ -1,4 +1,4 @@
-import { PubSub, withFilter } from "graphql-subscriptions";
+import { PubSub } from "graphql-subscriptions";
 import User from "./models/user.js";
 import Post from "./models/post.js";
 import Comment from "./models/comment.js";
@@ -8,11 +8,7 @@ const pubsub = new PubSub();
 
 const resolvers = {
   Query: {
-    users: async () => {
-      const test = await User.find();
-      console.log(test);
-      return test;
-    },
+    users: async () => await User.find(),
     user: async (_, { id }) => await User.findById(id),
 
     posts: async () =>
@@ -37,48 +33,31 @@ const resolvers = {
       return await User.find({ _id: { $nin: memberIds } });
     },
 
-    community: async (_, { id }) => {
-      return await Community.findById(id).populate("members");
-    },
+    community: async (_, { id }) => await Community.findById(id).populate("members"),
 
     postsByCommunity: async (_, { id }) => {
       const community = await Community.findById(id);
       if (!community) return [];
-
       const memberIds = community.members.map(m => m._id || m);
-
       return await Post.find({ userId: { $in: memberIds } })
         .populate("userId")
         .populate("comments")
         .sort({ createdAt: -1 });
-    }
+    },
   },
 
   Mutation: {
     addComment: async (_, { postId, text }) => {
       const userId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe
-
-      try {
-        const newComment = new Comment({ postId, userId, text });
-        await newComment.save();
-        await Post.findByIdAndUpdate(postId, {
-          $push: { comments: newComment._id },
-        });
-
-        return newComment;
-      } catch (error) {
-        console.error("Erreur lors de l'ajout du commentaire:", error);
-        throw new Error("Impossible d'ajouter le commentaire");
-      }
+      const newComment = new Comment({ postId, userId, text });
+      await newComment.save();
+      await Post.findByIdAndUpdate(postId, { $push: { comments: newComment._id } });
+      return newComment;
     },
 
     addCommunity: async (_, { name, description }) => {
       const defaultUserId = "65f1a1a1a1a1a1a1a1a1a1a1"; // exemple fixe
-      const community = new Community({
-        name,
-        description,
-        members: [defaultUserId]
-      });
+      const community = new Community({ name, description, members: [defaultUserId] });
       await community.save();
       return await community.populate("members");
     },
@@ -86,10 +65,8 @@ const resolvers = {
     updateCommunity: async (_, { id, name, description }) => {
       const community = await Community.findById(id);
       if (!community) throw new Error("Community not found");
-
       if (name !== undefined) community.name = name;
       if (description !== undefined) community.description = description;
-
       await community.save();
       return community;
     },
@@ -102,13 +79,64 @@ const resolvers = {
     addMemberToCommunity: async (_, { communityId, userId }) => {
       const community = await Community.findById(communityId);
       if (!community) throw new Error("Community not found");
-
       if (!community.members.includes(userId)) {
         community.members.push(userId);
         await community.save();
       }
-
       return await community.populate("members");
+    },
+
+    register: async (_, { username, email, password, fullName, avatar, bio }) => {
+      console.log("Tentative d'inscription avec :", {
+        username, email, password, fullName, avatar, bio
+      });
+
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        console.log("Email déjà utilisé :", email);
+        throw new Error("Email déjà utilisé");
+      }
+
+      const newUser = new User({
+        username,
+        email,
+        password,
+        fullName,
+        avatar,
+        createdAt: new Date(),
+        bio,
+        followers: [],
+        following: []
+      });
+
+      await newUser.save();
+      console.log("Utilisateur créé :", newUser);
+      return newUser;
+    },
+
+    login: async (_, { email, password }) => {
+      const user = await User.findOne({ email });
+      if (!user || user.password !== password) {
+        throw new Error("Email ou mot de passe invalide");
+      }
+      return user;
+    },
+    addPost: async (_, { userId, image, description }) => {
+      try {
+        const newPost = new Post({
+          userId,
+          image,
+          description,
+          createdAt: new Date(),
+          likes: [],
+          comments: []
+        });
+        await newPost.save();
+        return await newPost.populate("userId");
+      } catch (error) {
+        console.error("Erreur lors de la création du post :", error);
+        throw new Error("Échec de la création du post.");
+      }
     }
   },
 

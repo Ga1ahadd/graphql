@@ -1,12 +1,16 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_USER_COMMUNITIES } from "../queries.js";
+import { UserContext } from "./UserContext.jsx";
 
 function Navbar() {
+  const { user, setUser } = useContext(UserContext);
   const [communities, setCommunities] = useState([]);
 
-  const { data, loading, error } = useQuery(GET_USER_COMMUNITIES);
+  const { data, loading, error } = useQuery(GET_USER_COMMUNITIES, {
+    skip: !user,
+  });
 
   useEffect(() => {
     if (error) {
@@ -17,42 +21,58 @@ function Navbar() {
     }
   }, [data, error]);
 
+  const handleLogout = () => {
+    setUser(null);
+    localStorage.removeItem("user");
+  };
+
   return (
     <nav className="navbar">
       <h1>Instagram Clone</h1>
       <div className="nav-links">
         <Link to="/">🏠 Accueil</Link>
-        <Link to="/profile/1">👤 Mon Profil</Link>
 
-        <div className="dropdown-wrapper">
-          <div className="dropdown-toggle-wrapper">
-            <span className="dropdown-toggle">Communautés</span>
-            <div className="dropdown-menu">
-              {loading ? (
-                <span className="dropdown-item">Chargement...</span>
-              ) : error ? (
-                <span className="dropdown-item">Erreur lors du chargement</span>
-              ) : communities.length > 0 ? (
-                communities.map((c) => (
-                  <Link
-                    key={c.idCommunity || c.id}
-                    to={`/community/${c.idCommunity || c.id}`}
-                    className="dropdown-item"
-                  >
-                    {c.name}
+        {user ? (
+          <>
+            <Link to={`/profile/${user.id}`}>👤 Mon Profil</Link>
+
+            <div className="dropdown-wrapper">
+              <div className="dropdown-toggle-wrapper">
+                <span className="dropdown-toggle">🌐 Communautés</span>
+                <div className="dropdown-menu">
+                  {loading ? (
+                    <span className="dropdown-item">Chargement...</span>
+                  ) : error ? (
+                    <span className="dropdown-item">Erreur lors du chargement</span>
+                  ) : communities.length > 0 ? (
+                    communities.map((c) => (
+                      <Link
+                        key={c.id}
+                        to={`/community/${c.id}`}
+                        className="dropdown-item"
+                      >
+                        {c.name}
+                      </Link>
+                    ))
+                  ) : (
+                    <span className="dropdown-item no-community">
+                      Vous ne faites partie d'aucune communauté
+                    </span>
+                  )}
+                  <Link to="/admin/communities" className="dropdown-item admin-link">
+                    Gérer les communautés
                   </Link>
-                ))
-              ) : (
-                <span className="dropdown-item no-community">
-                  Vous ne faites partie d'aucune communauté
-                </span>
-              )}
-              <Link to="/admin/communities" className="dropdown-item admin-link">
-                Gérer les communautés
-              </Link>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+
+            <button onClick={handleLogout} className="logout-btn">
+              Déconnexion
+            </button>
+          </>
+        ) : (
+          <Link to="/auth">Connexion / Inscription</Link>
+        )}
       </div>
     </nav>
   );

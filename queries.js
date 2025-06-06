@@ -88,3 +88,15 @@ export const GET_NON_MEMBERS = gql`
     }
   }
 `
+export const GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      username
+      fullName
+      email
+      avatar
+      bio
+    }
+  }
+`

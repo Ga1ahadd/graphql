@@ -1,70 +1,65 @@
-import { useParams } from "react-router-dom";
-import { useQuery, useMutation } from "@apollo/client";
+import React, { useState, useContext } from "react"
+import { useParams, Link } from "react-router-dom"
+import { useQuery, useMutation } from "@apollo/client"
 import {
   GET_COMMUNITY_BY_ID,
   GET_POSTS_BY_COMMUNITY,
   GET_NON_MEMBERS
-} from "../../queries.js";
-import { Link } from "react-router-dom";
-import React, { useState } from "react";
-import { ADD_MEMBER_TO_COMMUNITY } from "../../mutations.js";
+} from "../../queries.js"
+import { ADD_MEMBER_TO_COMMUNITY, ADD_COMMENT } from "../../mutations.js"
+import { UserContext } from "../UserContext.jsx"
 
 function Community() {
-  const { id } = useParams();
+  const { user } = useContext(UserContext)
+  const { id } = useParams()
 
-  const {
-    data: communityData,
-    loading: loadingCommunity,
-    error: errorCommunity,
-  } = useQuery(GET_COMMUNITY_BY_ID, {
-    variables: { id },
-  });
+  const { data: communityData, loading: loadingCommunity, error: errorCommunity } =
+    useQuery(GET_COMMUNITY_BY_ID, { variables: { id } })
 
-  const {
-    data: postData,
-    loading: loadingPosts,
-    error: errorPosts,
-  } = useQuery(GET_POSTS_BY_COMMUNITY, {
-    variables: { id },
-  });
+  const { data: postData, loading: loadingPosts, error: errorPosts } =
+    useQuery(GET_POSTS_BY_COMMUNITY, { variables: { id } })
 
-  const {
-    data: nonMembersData,
-    loading: loadingNonMembers,
-  } = useQuery(GET_NON_MEMBERS, {
+  const { data: nonMembersData, loading: loadingNonMembers } = useQuery(GET_NON_MEMBERS, {
     variables: { communityId: id },
     skip: !id,
-  });
+  })
 
   const [addMember] = useMutation(ADD_MEMBER_TO_COMMUNITY, {
-    refetchQueries: [
-      { query: GET_COMMUNITY_BY_ID, variables: { id } }
-    ]
-  });
+    refetchQueries: [{ query: GET_COMMUNITY_BY_ID, variables: { id } }]
+  })
 
-  const [selectedUserId, setSelectedUserId] = useState("");
-  const [commentTexts, setCommentTexts] = useState({});
+  const [addCommentMutation] = useMutation(ADD_COMMENT, {
+    refetchQueries: [{ query: GET_POSTS_BY_COMMUNITY, variables: { id } }]
+  })
 
-  if (loadingCommunity || loadingPosts || loadingNonMembers) return <p>Chargement...</p>;
-  if (errorCommunity || errorPosts) return <p>Erreur lors du chargement des données</p>;
-  if (!communityData?.community) return <p>Aucune donnée trouvée.</p>;
-
-  const { name, description, members } = communityData.community;
+  const [selectedUserId, setSelectedUserId] = useState("")
+  const [commentTexts, setCommentTexts] = useState({})
 
   const handleAddMember = async () => {
-    if (!selectedUserId) return;
+    if (!selectedUserId) return
     try {
-      await addMember({
-        variables: {
-          communityId: id,
-          userId: selectedUserId
-        }
-      });
-      setSelectedUserId("");
+      await addMember({ variables: { communityId: id, userId: selectedUserId } })
+      setSelectedUserId("")
     } catch (err) {
-      console.error("Erreur lors de l'ajout du membre:", err);
+      console.error("Erreur lors de l'ajout du membre:", err)
     }
-  };
+  }
+
+  const handleAddComment = async (postId, text) => {
+    if (!text?.trim()) return
+    try {
+      await addCommentMutation({ variables: { postId, text } })
+      setCommentTexts(prev => ({ ...prev, [postId]: "" }))
+    } catch (err) {
+      console.error("Erreur ajout commentaire:", err)
+    }
+  }
+
+  if (loadingCommunity || loadingPosts || loadingNonMembers) return <p>Chargement...</p>
+  if (errorCommunity || errorPosts) return <p>Erreur lors du chargement des données</p>
+  if (!communityData?.community) return <p>Aucune donnée trouvée.</p>
+
+  const { name, description, members } = communityData.community
 
   return (
     <div className="community-page">
@@ -72,7 +67,6 @@ function Community() {
       <p>{description}</p>
 
       <h3>Publications des membres</h3>
-
       <div className="feed">
         {postData.postsByCommunity.map(post => (
           <div key={post.id} className="post">
@@ -95,31 +89,33 @@ function Community() {
               ))}
             </div>
 
-            <div className="comment-form">
-              <input
-                type="text"
-                placeholder="Ajouter un commentaire..."
-                value={commentTexts[post.id] || ""}
-                onChange={e =>
-                  setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))
-                }
-                onKeyDown={e => {
-                  if (e.key === "Enter") {
-                    handleAddComment(post.id, commentTexts[post.id] || "")
+            {user && (
+              <div className="comment-form">
+                <input
+                  type="text"
+                  placeholder="Ajouter un commentaire..."
+                  value={commentTexts[post.id] || ""}
+                  onChange={e =>
+                    setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))
                   }
-                }}
-              />
-              <button
-                onClick={() => {
-                  const comment = commentTexts[post.id];
-                  if (comment && comment.trim()) {
-                    handleAddComment(post.id, comment);
-                  }
-                }}
-              >
-                Publier
-              </button>
-            </div>
+                  onKeyDown={e => {
+                    if (e.key === "Enter") {
+                      handleAddComment(post.id, commentTexts[post.id] || "")
+                    }
+                  }}
+                />
+                <button
+                  onClick={() => {
+                    const comment = commentTexts[post.id]
+                    if (comment && comment.trim()) {
+                      handleAddComment(post.id, comment)
+                    }
+                  }}
+                >
+                  Publier
+                </button>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -135,23 +131,24 @@ function Community() {
         ))}
       </div>
 
-      <h4>Ajouter un membre</h4>
-      <select
-        value={selectedUserId}
-        onChange={(e) => setSelectedUserId(e.target.value)}
-      >
-        <option value="">-- Choisir un utilisateur --</option>
-        {nonMembersData?.nonMembers.map(user => (
-          <option key={user.id} value={user.id}>
-            {user.fullName} (@{user.username})
-          </option>
-        ))}
-      </select>
-      <button onClick={handleAddMember} disabled={!selectedUserId}>
-        Ajouter à la communauté
-      </button>
+      {user && (
+        <>
+          <h4>Ajouter un membre</h4>
+          <select value={selectedUserId} onChange={(e) => setSelectedUserId(e.target.value)}>
+            <option value="">-- Choisir un utilisateur --</option>
+            {nonMembersData?.nonMembers.map(user => (
+              <option key={user.id} value={user.id}>
+                {user.fullName} (@{user.username})
+              </option>
+            ))}
+          </select>
+          <button onClick={handleAddMember} disabled={!selectedUserId}>
+            Ajouter à la communauté
+          </button>
+        </>
+      )}
     </div>
-  );
+  )
 }
 
-export default Community;
+export default Community

@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import { useQuery, useMutation } from "@apollo/client";
 import {
-  GET_USER_COMMUNITIES,
-  GET_COMMUNITY_BY_ID,
-} from "../../queries.js";
+  GET_USER_COMMUNITIES, GET_COMMUNITY_BY_ID} from "../../queries.js";
 import {
-  ADD_COMMUNITY,
-  UPDATE_COMMUNITY,
-  DELETE_COMMUNITY,
-} from "../../mutations.js";
+  ADD_COMMUNITY, UPDATE_COMMUNITY, DELETE_COMMUNITY} from "../../mutations.js";
 
 function ManageCommunities() {
   const { data, loading, error } = useQuery(GET_USER_COMMUNITIES);

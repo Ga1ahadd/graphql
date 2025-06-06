@@ -1,11 +1,13 @@
-import React, { useState } from "react"
+import React, { useState, useContext } from "react"
 import { useQuery, useMutation } from "@apollo/client"
 import { Link } from "react-router-dom"
+import { UserContext } from "../UserContext.jsx"
 
 import { GET_POSTS } from "../../queries.js"
 import { ADD_POST, ADD_COMMENT } from "../../mutations.js"
 
 function Feed() {
+  const { user } = useContext(UserContext)
   const { data, loading, error } = useQuery(GET_POSTS)
   const [addPostMutation] = useMutation(ADD_POST, {
     refetchQueries: [{ query: GET_POSTS }]
@@ -16,18 +18,12 @@ function Feed() {
   const [newPostDesc, setNewPostDesc] = useState("")
   const [commentTexts, setCommentTexts] = useState({})
 
-  const currentUser = {
-    id: "1",
-    username: "john_doe",
-    avatar: "john.jpg"
-  }
-
   const handleAddPost = async () => {
-    if (!newPostImage || !newPostDesc) return
+    if (!newPostImage || !newPostDesc || !user) return
     try {
       await addPostMutation({
         variables: {
-          userId: currentUser.id,
+          userId: user.id,
           image: newPostImage,
           description: newPostDesc
         }
@@ -40,7 +36,7 @@ function Feed() {
   }
 
   const handleAddComment = async (postId, text) => {
-    if (!text?.trim()) return;
+    if (!text?.trim()) return
 
     try {
       await addCommentMutation({
@@ -58,7 +54,7 @@ function Feed() {
           })
         }
       })
-      
+
       setCommentTexts(prev => ({ ...prev, [postId]: "" }))
     } catch (err) {
       console.error("Erreur ajout commentaire:", err)
@@ -70,21 +66,23 @@ function Feed() {
 
   return (
     <div className="feed">
-      <div className="new-post">
-        <input
-          type="text"
-          placeholder="URL de l'image"
-          value={newPostImage}
-          onChange={e => setNewPostImage(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Description"
-          value={newPostDesc}
-          onChange={e => setNewPostDesc(e.target.value)}
-        />
-        <button onClick={handleAddPost}>Publier</button>
-      </div>
+      {user && (
+        <div className="new-post">
+          <input
+            type="text"
+            placeholder="URL de l'image"
+            value={newPostImage}
+            onChange={e => setNewPostImage(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Description"
+            value={newPostDesc}
+            onChange={e => setNewPostDesc(e.target.value)}
+          />
+          <button onClick={handleAddPost}>Publier</button>
+        </div>
+      )}
 
       {data.posts.map(post => (
         <div key={post.id} className="post">
@@ -107,31 +105,33 @@ function Feed() {
             ))}
           </div>
 
-          <div className="comment-form">
-            <input
-              type="text"
-              placeholder="Ajouter un commentaire..."
-              value={commentTexts[post.id] || ""}
-              onChange={e =>
-                setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))
-              }
-              onKeyDown={e => {
-                if (e.key === "Enter") {
-                  handleAddComment(post.id, commentTexts[post.id] || "")
+          {user && (
+            <div className="comment-form">
+              <input
+                type="text"
+                placeholder="Ajouter un commentaire..."
+                value={commentTexts[post.id] || ""}
+                onChange={e =>
+                  setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))
                 }
-              }}
-            />
-            <button
-              onClick={() => {
-                const comment = commentTexts[post.id];
-                if (comment && comment.trim()) {
-                  handleAddComment(post.id, comment);
-                }
-              }}
-            >
-              Publier
-            </button>
-          </div>
+                onKeyDown={e => {
+                  if (e.key === "Enter") {
+                    handleAddComment(post.id, commentTexts[post.id] || "")
+                  }
+                }}
+              />
+              <button
+                onClick={() => {
+                  const comment = commentTexts[post.id]
+                  if (comment && comment.trim()) {
+                    handleAddComment(post.id, comment)
+                  }
+                }}
+              >
+                Publier
+              </button>
+            </div>
+          )}
         </div>
       ))}
     </div>

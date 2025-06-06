@@ -1,31 +1,46 @@
 import React, { useState } from "react"
-import { useParams } from "react-router-dom"
-import data from "../data.json"
+import { useQuery, useMutation } from "@apollo/client"
+import { useUser } from "../UserContext"
+import { GET_POSTS, GET_USER } from "../../queries.js"
+import { ADD_COMMENT } from "../../mutations.js"
 
 function Profile() {
-  const { id } = useParams()
-  const user = data.users.find(user => user.id === id)
-  const userPosts = data.posts.filter(post => post.userId === id)
+  const { user: currentUser } = useUser()
 
-  const [comments, setComments] = useState(data.comments)
+  const { data: userData, loading: loadingUser, error: errorUser } = useQuery(GET_USER, {
+    variables: { id: currentUser?.id },
+    skip: !currentUser?.id
+  })
 
-  const addComment = (postId, text) => {
-    const newComment = {
-      id: Date.now().toString(),
-      postId,
-      userId: "1",
-      text,
-      createdAt: new Date().toISOString(),
+  const { data: postsData, loading: loadingPosts, error: errorPosts } = useQuery(GET_POSTS)
+  const [addCommentMutation] = useMutation(ADD_COMMENT)
+  const [commentTexts, setCommentTexts] = useState({})
+
+  if (!currentUser || loadingUser || loadingPosts) return <p>Chargement...</p>
+  if (errorUser || errorPosts) return <p>Erreur lors du chargement des données</p>
+
+  const user = userData?.user
+  const userPosts = postsData?.posts.filter(post => post.userId.id === user.id)
+
+  const handleAddComment = async (postId, text) => {
+    if (!text?.trim()) return
+    try {
+      await addCommentMutation({
+        variables: { postId, text },
+        update(cache, { data: { addComment } }) {
+          const existing = cache.readQuery({ query: GET_POSTS })
+          const updatedPosts = existing.posts.map(post =>
+            post.id === postId
+              ? { ...post, comments: [...post.comments, addComment] }
+              : post
+          )
+          cache.writeQuery({ query: GET_POSTS, data: { posts: updatedPosts } })
+        }
+      })
+      setCommentTexts(prev => ({ ...prev, [postId]: "" }))
+    } catch (err) {
+      console.error("Erreur ajout commentaire:", err)
     }
-    setComments([...comments, newComment])
-  }
-
-  const deleteComment = commentId => {
-    setComments(comments.filter(c => c.id !== commentId))
-  }
-
-  if (!user) {
-    return <p>Utilisateur non trouvé.</p>
   }
 
   return (
@@ -35,6 +50,7 @@ function Profile() {
         <h2>{user.fullName}</h2>
         <p className="bio">{user.bio}</p>
       </div>
+
       <div className="profile-posts">
         {userPosts.length > 0 ? (
           userPosts.map(post => (
@@ -42,32 +58,28 @@ function Profile() {
               <img src={`/images/${post.image}`} alt={post.description} />
               <p>{post.description}</p>
 
-              {/* Liste des commentaires */}
               <div className="comments">
-                {comments
-                  .filter(c => c.postId === post.id)
-                  .map(c => {
-                    const commentUser = data.users.find(u => u.id === c.userId)
-                    return (
-                      <div key={c.id} className="comment">
-                        <strong>{commentUser.username}:</strong> {c.text}
-                        {c.userId === "1" && <button onClick={() => deleteComment(c.id)}>❌</button>}
-                      </div>
-                    )
-                  })}
+                {post.comments.map(c => (
+                  <div key={c.id} className="comment">
+                    <strong>{c.userId.username}:</strong> {c.text}
+                  </div>
+                ))}
               </div>
 
-              {/* Ajout d'un commentaire */}
               <input
                 type="text"
-                placeholder="&nbsp; Ajouter un commentaire..."
+                placeholder="Ajouter un commentaire..."
+                value={commentTexts[post.id] || ""}
+                onChange={e => setCommentTexts(prev => ({ ...prev, [post.id]: e.target.value }))}
                 onKeyDown={e => {
-                  if (e.key === "Enter" && e.target.value.trim() !== "") {
-                    addComment(post.id, e.target.value)
-                    e.target.value = ""
+                  if (e.key === "Enter") {
+                    handleAddComment(post.id, commentTexts[post.id] || "")
                   }
                 }}
               />
+              <button onClick={() => handleAddComment(post.id, commentTexts[post.id] || "")}>
+                Publier
+              </button>
             </div>
           ))
         ) : (
