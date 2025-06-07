@@ -1,4 +1,4 @@
-import { PubSub, withFilter } from "graphql-subscriptions";
+import { PubSub, withFilter } from "graphql-subscriptions"
 import User from "./models/user.js";
 import Post from "./models/post.js";
 import Comment from "./models/comment.js";

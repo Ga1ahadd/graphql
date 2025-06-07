@@ -1,23 +1,46 @@
 import React, { useState, useContext } from "react";
 import { useQuery, useMutation } from "@apollo/client";
-import { GET_USER_COMMUNITIES, GET_COMMUNITY_BY_ID} from "../../queries.js";
-import { ADD_COMMUNITY, UPDATE_COMMUNITY, DELETE_COMMUNITY} from "../../mutations.js";
+import { GET_USER_COMMUNITIES } from "../../queries.js";
+import {
+  ADD_COMMUNITY,
+  UPDATE_COMMUNITY,
+  DELETE_COMMUNITY
+} from "../../mutations.js";
 import { UserContext } from "../UserContext.jsx";
 
 function ManageCommunities() {
   const { user } = useContext(UserContext);
+
   const { data, loading, error } = useQuery(GET_USER_COMMUNITIES, {
     variables: { userId: user?.id },
     skip: !user,
   });
+
   const [addCommunity] = useMutation(ADD_COMMUNITY, {
-    refetchQueries: [{ query: GET_USER_COMMUNITIES }],
+    refetchQueries: [
+      {
+        query: GET_USER_COMMUNITIES,
+        variables: { userId: user?.id },
+      },
+    ],
   });
-  const [updateCommunity] = useMutation(UPDATE_COMMUNITY, {
-    refetchQueries: [{ query: GET_USER_COMMUNITIES }],
+
+  const [updateCommunity, { loading: updating }] = useMutation(UPDATE_COMMUNITY, {
+    refetchQueries: [
+      {
+        query: GET_USER_COMMUNITIES,
+        variables: { userId: user?.id },
+      },
+    ],
   });
+
   const [deleteCommunity] = useMutation(DELETE_COMMUNITY, {
-    refetchQueries: [{ query: GET_USER_COMMUNITIES }],
+    refetchQueries: [
+      {
+        query: GET_USER_COMMUNITIES,
+        variables: { userId: user?.id },
+      },
+    ],
   });
 
   const [newCommunity, setNewCommunity] = useState({ name: "", description: "" });
@@ -40,14 +63,35 @@ function ManageCommunities() {
   };
 
   const handleUpdate = async (id) => {
-    const input = editState[id];
-    if (!input?.name?.trim()) return;
-    await updateCommunity({ variables: { id, ...input } });
-    setEditState(prev => {
-      const updated = { ...prev };
-      delete updated[id];
-      return updated;
-    });
+    console.log("🟡 handleUpdate appelé pour :", id);
+
+    const edited = editState[id];
+    if (!edited) {
+      console.log("⚠️ Rien à modifier");
+      return;
+    }
+
+    const original = data.communitiesByUser.find(c => c.id === id);
+    if (!original) return;
+
+    const updatedData = {
+      id,
+      name: edited.name?.trim() || original.name,
+      description: edited.description?.trim() || original.description,
+    };
+
+    console.log("🔧 Données envoyées pour mise à jour :", updatedData);
+
+    try {
+      await updateCommunity({ variables: updatedData });
+      setEditState(prev => {
+        const updated = { ...prev };
+        delete updated[id];
+        return updated;
+      });
+    } catch (err) {
+      console.error("❌ Erreur lors de la mise à jour :", err);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -80,22 +124,28 @@ function ManageCommunities() {
       </div>
 
       <ul className="community-list">
-        {data.communitiesByUser.map((c) => (
-          <li key={c.id}>
-            <input
-              type="text"
-              value={editState[c.id]?.name ?? c.name}
-              onChange={(e) => handleEditChange(c.id, "name", e.target.value)}
-            />
-            <input
-              type="text"
-              value={editState[c.id]?.description ?? c.description}
-              onChange={(e) => handleEditChange(c.id, "description", e.target.value)}
-            />
-            <button onClick={() => handleUpdate(c.id)}>Modifier</button>
-            <button onClick={() => handleDelete(c.id)}>Supprimer</button>
-          </li>
-        ))}
+        {data?.communitiesByUser?.length > 0 ? (
+          data.communitiesByUser.map((c) => (
+            <li key={c.id}>
+              <input
+                type="text"
+                value={editState[c.id]?.name ?? c.name}
+                onChange={(e) => handleEditChange(c.id, "name", e.target.value)}
+              />
+              <input
+                type="text"
+                value={editState[c.id]?.description ?? c.description}
+                onChange={(e) => handleEditChange(c.id, "description", e.target.value)}
+              />
+              <button onClick={() => handleUpdate(c.id)} disabled={updating}>
+                {updating ? "Mise à jour..." : "Modifier"}
+              </button>
+              <button onClick={() => handleDelete(c.id)}>Supprimer</button>
+            </li>
+          ))
+        ) : (
+          <p>Aucune communauté trouvée.</p>
+        )}
       </ul>
     </div>
   );

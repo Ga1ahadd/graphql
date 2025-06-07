@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@apollo/client";
 import { GET_USER_COMMUNITIES } from "../queries.js";
 import { UserContext } from "./UserContext.jsx";
@@ -15,9 +15,9 @@ function Navbar() {
 
   useEffect(() => {
     if (error) {
-      console.error("Apollo error:", error);
+      console.error("Erreur Apollo :", error);
     }
-    if (data && data.communitiesByUser) {
+    if (data?.communitiesByUser) {
       setCommunities(data.communitiesByUser);
     }
   }, [data, error]);
@@ -25,6 +25,7 @@ function Navbar() {
   const handleLogout = () => {
     setUser(null);
     localStorage.removeItem("user");
+    navigate("/");
   };
 
   return (
